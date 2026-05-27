@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transmissor de Código Morse</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Transmissor de Código Morse</h1>
+    <div id="name-form">
+      <input type="text" id="user-name" placeholder="Seu nome" maxlength="20">
+    </div>
+    <div id="main-menu">
+      <button id="btn-create">Criar Sala</button>
+      <button id="btn-join">Entrar em uma Sala</button>
+    </div>
+    <div id="join-form" class="hidden">
+      <input type="text" id="room-code" placeholder="Digite o código da sala" maxlength="6">
+      <button id="btn-join-room">Entrar</button>
+      <button id="btn-back">Voltar</button>
+    </div>
+    <div id="room-screen" class="hidden">
+      <p id="room-code-display"></p>
+      <div id="users-list">
+        <h3>Participantes</h3>
+        <ul id="users-ul"></ul>
+      </div>
+      <button id="btn-morse">Transmitir</button>
+      <button id="btn-leave">Sair da Sala</button>
+    </div>
+    <p id="message"></p>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

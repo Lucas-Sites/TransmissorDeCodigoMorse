@@ -1,0 +1,163 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  text-align: center;
+  padding: 2rem;
+  background: #16213e;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  max-width: 400px;
+  width: 90%;
+}
+
+h1 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #aaa;
+}
+
+button {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.05s;
+}
+
+#btn-create {
+  background: #0f3460;
+  color: #fff;
+}
+
+#btn-create:hover {
+  background: #1a4a7a;
+}
+
+#btn-join {
+  background: #533483;
+  color: #fff;
+}
+
+#btn-join:hover {
+  background: #6b4499;
+}
+
+#btn-morse {
+  background: #e94560;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 100%;
+  padding: 1.2rem;
+  border-radius: 50px;
+  margin: 0.5rem 0;
+  box-shadow: 0 0 20px rgba(233, 69, 96, 0.6), 0 0 40px rgba(233, 69, 96, 0.3), 0 6px 0 #b03045;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: all 0.1s ease;
+}
+
+#btn-morse:hover {
+  background: #ff6b81;
+  box-shadow: 0 0 25px rgba(255, 107, 129, 0.7), 0 0 50px rgba(255, 107, 129, 0.4), 0 6px 0 #b03045;
+}
+
+#btn-morse:active {
+  transform: translateY(6px);
+  background: #ff8c00;
+  box-shadow: 0 0 15px rgba(255, 140, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.5), 0 0 0 #b03045;
+}
+
+#btn-back, #btn-leave {
+  background: #444;
+  color: #fff;
+}
+
+#btn-back:hover, #btn-leave:hover {
+  background: #555;
+}
+
+#room-code, #user-name {
+  width: 100%;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#user-name {
+  text-transform: none;
+}
+
+#room-code-display {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #00d4aa;
+}
+
+#message {
+  margin-top: 1rem;
+  color: #ff6b6b;
+  min-height: 1.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#room-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#users-list {
+  background: #0f3460;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+#users-ul {
+  list-style: none;
+  text-align: left;
+}
+
+#users-ul li {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #1a4a7a;
+  color: #ddd;
+}
+
+#users-ul li:last-child {
+  border-bottom: none;
+}
+
