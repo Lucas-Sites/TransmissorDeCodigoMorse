@@ -77,8 +77,11 @@ button {
   box-shadow: 0 0 20px rgba(233, 69, 96, 0.6), 0 0 40px rgba(233, 69, 96, 0.3), 0 6px 0 #b03045;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;
-  transition: all 0.1s ease;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.05s ease;
 }
 
 #btn-morse:hover {
@@ -86,7 +89,7 @@ button {
   box-shadow: 0 0 25px rgba(255, 107, 129, 0.7), 0 0 50px rgba(255, 107, 129, 0.4), 0 6px 0 #b03045;
 }
 
-#btn-morse:active {
+#btn-morse:active, #btn-morse.pressed {
   transform: translateY(6px);
   background: #ff8c00;
   box-shadow: 0 0 15px rgba(255, 140, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.5), 0 0 0 #b03045;

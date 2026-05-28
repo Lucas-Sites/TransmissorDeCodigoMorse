@@ -200,33 +200,62 @@ btnLeave.addEventListener('click', () => {
   connect();
 });
 
-btnMorse.addEventListener('mousedown', () => {
-  console.log('[MORSE] mousedown, currentRoom:', currentRoom, 'socket readyState:', socket ? socket.readyState : 'no socket');
+let isTransmitting = false;
+
+function startTransmit() {
+  if (isTransmitting) return;
   if (!currentRoom) {
     showMessage('Entre em uma sala primeiro');
     return;
   }
+  isTransmitting = true;
+  btnMorse.classList.add('pressed');
   playTone();
   send({ type: 'morse-signal' });
+}
+
+function stopTransmit() {
+  if (!isTransmitting) return;
+  isTransmitting = false;
+  btnMorse.classList.remove('pressed');
+  stopTone();
+}
+
+btnMorse.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  startTransmit();
 });
 
-btnMorse.addEventListener('mouseup', stopTone);
-btnMorse.addEventListener('mouseleave', stopTone);
+btnMorse.addEventListener('mouseup', (e) => {
+  e.preventDefault();
+  stopTransmit();
+});
+
+btnMorse.addEventListener('mouseleave', (e) => {
+  if (isTransmitting) stopTransmit();
+});
 
 btnMorse.addEventListener('touchstart', (e) => {
   e.preventDefault();
-  console.log('[MORSE] touchstart, currentRoom:', currentRoom);
-  if (!currentRoom) {
-    showMessage('Entre em uma sala primeiro');
-    return;
-  }
-  playTone();
-  send({ type: 'morse-signal' });
-});
+  startTransmit();
+}, { passive: false });
 
 btnMorse.addEventListener('touchend', (e) => {
   e.preventDefault();
-  stopTone();
+  stopTransmit();
+}, { passive: false });
+
+btnMorse.addEventListener('touchcancel', (e) => {
+  e.preventDefault();
+  stopTransmit();
+}, { passive: false });
+
+document.addEventListener('mouseup', () => {
+  if (isTransmitting) stopTransmit();
+});
+
+document.addEventListener('touchend', () => {
+  if (isTransmitting) stopTransmit();
 });
 
 connect();
