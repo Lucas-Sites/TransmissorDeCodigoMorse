@@ -104,8 +104,11 @@ function connect() {
 }
 
 function send(msg) {
+  console.log('[SEND]', msg, 'readyState:', socket ? socket.readyState : 'no socket');
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(msg));
+  } else {
+    console.warn('[SEND] WebSocket not open');
   }
 }
 
@@ -198,7 +201,11 @@ btnLeave.addEventListener('click', () => {
 });
 
 btnMorse.addEventListener('mousedown', () => {
-  if (!currentRoom) return;
+  console.log('[MORSE] mousedown, currentRoom:', currentRoom, 'socket readyState:', socket ? socket.readyState : 'no socket');
+  if (!currentRoom) {
+    showMessage('Entre em uma sala primeiro');
+    return;
+  }
   playTone();
   send({ type: 'morse-signal' });
 });
@@ -208,7 +215,11 @@ btnMorse.addEventListener('mouseleave', stopTone);
 
 btnMorse.addEventListener('touchstart', (e) => {
   e.preventDefault();
-  if (!currentRoom) return;
+  console.log('[MORSE] touchstart, currentRoom:', currentRoom);
+  if (!currentRoom) {
+    showMessage('Entre em uma sala primeiro');
+    return;
+  }
   playTone();
   send({ type: 'morse-signal' });
 });
