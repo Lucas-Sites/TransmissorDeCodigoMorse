@@ -1,4 +1,10 @@
-const socket = io('https://morsecodetransmitterbackend.onrender.com/');
+const WS_URL = 'wss://morsecodetransmitterbackend.onrender.com/';
+let socket = null;
+let reconnectInterval = null;
+let currentRoom = null;
+let audioCtx = null;
+let oscillator = null;
+let gainNode = null;
 
 const mainMenu = document.getElementById('main-menu');
 const joinForm = document.getElementById('join-form');
@@ -14,12 +20,7 @@ const roomCodeInput = document.getElementById('room-code');
 const roomCodeDisplay = document.getElementById('room-code-display');
 const userNameInput = document.getElementById('user-name');
 const usersUl = document.getElementById('users-ul');
-const message = document.getElementById('message');
-
-let currentRoom = null;
-let audioCtx = null;
-let oscillator = null;
-let gainNode = null;
+const messageEl = document.getElementById('message');
 
 function show(el) {
   el.classList.remove('hidden');
@@ -30,8 +31,8 @@ function hide(el) {
 }
 
 function showMessage(msg) {
-  message.textContent = msg;
-  setTimeout(() => message.textContent = '', 3000);
+  messageEl.textContent = msg;
+  setTimeout(() => messageEl.textContent = '', 3000);
 }
 
 function initAudio() {
@@ -75,36 +76,65 @@ function getUserName() {
   return userNameInput.value.trim() || 'Anônimo';
 }
 
-btnCreate.addEventListener('click', () => {
-  socket.emit('create-room', getUserName());
-});
+function connect() {
+  socket = new WebSocket(WS_URL);
 
-btnJoin.addEventListener('click', () => {
-  hide(mainMenu);
-  hide(nameForm);
-  show(joinForm);
-  roomCodeInput.focus();
-});
+  socket.onopen = () => {
+    messageEl.textContent = '';
+  };
 
-btnBack.addEventListener('click', () => {
-  hide(joinForm);
-  show(mainMenu);
-  show(nameForm);
-  roomCodeInput.value = '';
-});
+  socket.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data);
+      handleMessage(msg);
+    } catch (e) {
+      console.error('Invalid message:', event.data);
+    }
+  };
 
-btnJoinRoom.addEventListener('click', () => {
-  const code = roomCodeInput.value.trim().toUpperCase();
-  if (code.length !== 6) {
-    showMessage('Digite um código de 6 caracteres');
-    return;
+  socket.onclose = () => {
+    showMessage('Desconectado do servidor');
+    clearInterval(reconnectInterval);
+    reconnectInterval = setTimeout(connect, 3000);
+  };
+
+  socket.onerror = () => {
+    showMessage('Erro de conexão');
+  };
+}
+
+function send(msg) {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify(msg));
   }
-  socket.emit('join-room', code, getUserName());
-});
+}
 
-roomCodeInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') btnJoinRoom.click();
-});
+function handleMessage(msg) {
+  switch (msg.type) {
+    case 'room-created':
+      enterRoom(msg.code);
+      break;
+    case 'joined-room':
+      enterRoom(msg.code);
+      break;
+    case 'error':
+      showMessage(msg.message);
+      break;
+    case 'morse-signal':
+      playTone();
+      setTimeout(stopTone, 200);
+      break;
+    case 'room-users':
+      renderUsers(msg.users);
+      break;
+    case 'user-joined':
+      showMessage(`${msg.name} entrou na sala`);
+      break;
+    case 'user-left':
+      showMessage(`${msg.name} saiu da sala`);
+      break;
+  }
+}
 
 function enterRoom(code) {
   currentRoom = code;
@@ -127,16 +157,50 @@ function leaveRoom() {
   usersUl.innerHTML = '';
 }
 
+btnCreate.addEventListener('click', () => {
+  send({ type: 'create-room', name: getUserName() });
+});
+
+btnJoin.addEventListener('click', () => {
+  hide(mainMenu);
+  hide(nameForm);
+  show(joinForm);
+  roomCodeInput.focus();
+});
+
+btnBack.addEventListener('click', () => {
+  hide(joinForm);
+  show(mainMenu);
+  show(nameForm);
+  roomCodeInput.value = '';
+});
+
+btnJoinRoom.addEventListener('click', () => {
+  const code = roomCodeInput.value.trim().toUpperCase();
+  if (code.length !== 6) {
+    showMessage('Digite um código de 6 caracteres');
+    return;
+  }
+  send({ type: 'join-room', code, name: getUserName() });
+});
+
+roomCodeInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') btnJoinRoom.click();
+});
+
 btnLeave.addEventListener('click', () => {
-  socket.disconnect();
-  socket.connect();
+  if (socket) {
+    socket.close();
+  }
+  clearInterval(reconnectInterval);
   leaveRoom();
+  connect();
 });
 
 btnMorse.addEventListener('mousedown', () => {
   if (!currentRoom) return;
   playTone();
-  socket.emit('morse-signal', currentRoom);
+  send({ type: 'morse-signal' });
 });
 
 btnMorse.addEventListener('mouseup', stopTone);
@@ -146,7 +210,7 @@ btnMorse.addEventListener('touchstart', (e) => {
   e.preventDefault();
   if (!currentRoom) return;
   playTone();
-  socket.emit('morse-signal', currentRoom);
+  send({ type: 'morse-signal' });
 });
 
 btnMorse.addEventListener('touchend', (e) => {
@@ -154,39 +218,4 @@ btnMorse.addEventListener('touchend', (e) => {
   stopTone();
 });
 
-socket.on('room-created', (code) => {
-  enterRoom(code);
-});
-
-socket.on('joined-room', (code) => {
-  enterRoom(code);
-});
-
-socket.on('error', (msg) => {
-  showMessage(msg);
-});
-
-socket.on('morse-signal', () => {
-  playTone();
-  setTimeout(stopTone, 200);
-});
-
-socket.on('room-users', (users) => {
-  renderUsers(users);
-});
-
-socket.on('user-joined', (name) => {
-  showMessage(`${name} entrou na sala`);
-});
-
-socket.on('user-left', (name) => {
-  showMessage(`${name} saiu da sala`);
-});
-
-socket.on('connect', () => {
-  message.textContent = '';
-});
-
-socket.on('disconnect', () => {
-  showMessage('Desconectado do servidor');
-});
+connect();
