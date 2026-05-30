@@ -43,6 +43,9 @@ function initAudio() {
 
 function playTone() {
   initAudio();
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
   if (oscillator) return;
   oscillator = audioCtx.createOscillator();
   gainNode = audioCtx.createGain();
@@ -212,6 +215,7 @@ function startTransmit() {
   btnMorse.classList.add('pressed');
   playTone();
   send({ type: 'morse-signal' });
+  console.log('[TRANSMIT] ON');
 }
 
 function stopTransmit() {
@@ -219,6 +223,7 @@ function stopTransmit() {
   isTransmitting = false;
   btnMorse.classList.remove('pressed');
   stopTone();
+  console.log('[TRANSMIT] OFF');
 }
 
 btnMorse.addEventListener('mousedown', (e) => {
@@ -231,7 +236,7 @@ btnMorse.addEventListener('mouseup', (e) => {
   stopTransmit();
 });
 
-btnMorse.addEventListener('mouseleave', (e) => {
+btnMorse.addEventListener('mouseleave', () => {
   if (isTransmitting) stopTransmit();
 });
 
@@ -249,13 +254,5 @@ btnMorse.addEventListener('touchcancel', (e) => {
   e.preventDefault();
   stopTransmit();
 }, { passive: false });
-
-document.addEventListener('mouseup', () => {
-  if (isTransmitting) stopTransmit();
-});
-
-document.addEventListener('touchend', () => {
-  if (isTransmitting) stopTransmit();
-});
 
 connect();
